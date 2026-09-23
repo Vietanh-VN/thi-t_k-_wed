@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../services/api';
+import { MOCK_ACTIVE_SESSIONS } from '../services/mockData';
 import {
   LogOut,
   Car,
@@ -16,13 +17,39 @@ import {
   MapPin
 } from 'lucide-react';
 
+// Helper an toàn parse giờ: Không bao giờ crash
+const safeTime = (str) => {
+  if (!str) return '08:00';
+  try {
+    const s = String(str).includes(' ') ? String(str).replace(' ', 'T') : String(str);
+    const d = new Date(s);
+    if (isNaN(d.getTime())) return str.slice(11, 16) || '08:00';
+    return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return '08:00';
+  }
+};
+
+// Helper an toàn parse ngày giờ
+const safeDateTime = (str) => {
+  if (!str) return new Date().toLocaleString('vi-VN');
+  try {
+    const s = String(str).includes(' ') ? String(str).replace(' ', 'T') : String(str);
+    const d = new Date(s);
+    if (isNaN(d.getTime())) return String(str);
+    return d.toLocaleString('vi-VN');
+  } catch {
+    return String(str);
+  }
+};
+
 const CheckOut = () => {
   const [searchParams] = useSearchParams();
   const initialPlate = searchParams.get('plate') || '';
 
   const [bienSo, setBienSo] = useState(initialPlate);
   const [matVe, setMatVe] = useState(false);
-  const [activeSessions, setActiveSessions] = useState([]);
+  const [activeSessions, setActiveSessions] = useState(() => Array.isArray(MOCK_ACTIVE_SESSIONS) ? MOCK_ACTIVE_SESSIONS : []);
   const [feeInfo, setFeeInfo] = useState(null);
   const [successReceipt, setSuccessReceipt] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -33,9 +60,11 @@ const CheckOut = () => {
   const fetchActiveSessions = async () => {
     try {
       const res = await api.get('/parking/active-sessions');
-      setActiveSessions(res.data);
+      if (Array.isArray(res?.data) && res.data.length > 0) {
+        setActiveSessions(res.data);
+      }
     } catch (e) {
-      console.error(e);
+      console.warn("Backend offline, sử dụng danh sách xe mẫu:", e);
     }
   };
 
@@ -48,7 +77,7 @@ const CheckOut = () => {
 
   const handleCalculate = async (plateToCalc, isLostTicket = matVe) => {
     const target = plateToCalc || bienSo;
-    if (!target.trim()) return;
+    if (!target || !target.trim()) return;
 
     setError('');
     setCalculating(true);
@@ -66,17 +95,20 @@ const CheckOut = () => {
         throw new Error('Fallback');
       }
     } catch (err) {
-      // Fallback tính phí xe máy tức thì trên GitHub Pages
+      // Fallback tính phí xe máy an toàn trên GitHub Pages
       const isMat = Boolean(isLostTicket);
       const fee = 5000;
       const penalty = isMat ? 10000 : 0;
+      const cleanPlate = target.trim().toUpperCase();
+      const matched = activeSessions.find(s => s.BienSo === cleanPlate) || activeSessions[0];
+
       setFeeInfo({
-        LuotGuiId: 101,
-        BienSo: target.trim().toUpperCase(),
-        TenLoaiXe: 'Xe máy',
-        TenViTri: 'B-03',
-        TenKhuVuc: 'Khu B - Xe máy',
-        ThoiGianVao: new Date(Date.now() - 7200000).toISOString(),
+        LuotGuiId: matched?.LuotGuiId || 101,
+        BienSo: cleanPlate,
+        TenLoaiXe: matched?.TenLoaiXe || 'Xe máy',
+        TenViTri: matched?.TenViTri || 'B-03',
+        TenKhuVuc: matched?.TenKhuVuc || 'Khu B - Xe máy',
+        ThoiGianVao: matched?.ThoiGianVao || new Date(Date.now() - 7200000).toISOString(),
         ThoiGianRa: new Date().toISOString(),
         SoPhutGui: 120,
         SoGioGui: 2,
@@ -92,7 +124,7 @@ const CheckOut = () => {
 
   const handleToggleLostTicket = (checked) => {
     setMatVe(checked);
-    if (bienSo.trim()) {
+    if (bienSo && bienSo.trim()) {
       handleCalculate(bienSo.trim(), checked);
     }
   };
@@ -124,14 +156,13 @@ const CheckOut = () => {
         TongTien: feeInfo.TongTien,
         PhuongThucThanhToan: 'TienMat',
         TrangThai: 'ThanhCong',
-        NhanVienThuTien: 'Hoàng Văn Minh'
+        NhanVienThuTien: 'Nông Việt Anh'
       });
     } finally {
       setFeeInfo(null);
       setBienSo('');
       setMatVe(false);
       setLoading(false);
-      fetchActiveSessions();
     }
   };
 
@@ -166,7 +197,7 @@ const CheckOut = () => {
                   value={bienSo}
                   onChange={(e) => setBienSo(e.target.value.toUpperCase())}
                   onKeyDown={(e) => e.key === 'Enter' && handleCalculate(bienSo)}
-                  placeholder="Nhập biển số xe (VD: 29B1-88990)..."
+                  placeholder="Nhập biển số xe (VD: 20B1-123.45)..."
                   className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-base font-mono font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white uppercase transition-all"
                 />
               </div>
@@ -187,7 +218,7 @@ const CheckOut = () => {
               </button>
             </div>
 
-            {/* Use Case 2.5.4: Khách báo mất vé */}
+            {/* Khách báo mất vé */}
             <div className="flex items-center justify-between p-3.5 rounded-2xl bg-amber-50/90 border border-amber-200">
               <label htmlFor="matVeCheck" className="flex items-center space-x-2.5 cursor-pointer select-none">
                 <input
@@ -208,7 +239,7 @@ const CheckOut = () => {
             </div>
 
             {/* Quick Active Parked Vehicles Chips */}
-            {activeSessions.length > 0 && (
+            {activeSessions && activeSessions.length > 0 && (
               <div className="flex flex-wrap items-center gap-1.5 pt-1">
                 <span className="text-[11px] text-slate-400 font-semibold">Xe đang chờ xuất bãi:</span>
                 {activeSessions.slice(0, 5).map((s) => (
@@ -220,7 +251,7 @@ const CheckOut = () => {
                       handleCalculate(s.BienSo, matVe);
                     }}
                     className="px-2.5 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 text-[11px] font-mono font-bold transition-colors border border-sky-200"
-                    title={`Vào lúc ${new Date(s.ThoiGianVao).toLocaleTimeString('vi-VN')}`}
+                    title={`Vào lúc ${safeTime(s.ThoiGianVao)}`}
                   >
                     {s.BienSo} ({s.TenViTri})
                   </button>
@@ -263,13 +294,13 @@ const CheckOut = () => {
                 <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
                   <span className="text-slate-500 block text-[11px]">Thời gian vào</span>
                   <span className="font-semibold text-slate-800">
-                    {new Date(feeInfo.ThoiGianVao).toLocaleString('vi-VN')}
+                    {safeDateTime(feeInfo.ThoiGianVao)}
                   </span>
                 </div>
                 <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
                   <span className="text-slate-500 block text-[11px]">Thời gian ra dự kiến</span>
                   <span className="font-semibold text-slate-800">
-                    {new Date(feeInfo.ThoiGianRa).toLocaleString('vi-VN')}
+                    {safeDateTime(feeInfo.ThoiGianRa)}
                   </span>
                 </div>
               </div>
@@ -279,116 +310,73 @@ const CheckOut = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-sky-900 font-semibold">Tổng thời gian gửi:</span>
                   <span className="font-extrabold text-sky-900 text-sm">
-                    {Math.floor(feeInfo.SoPhutGui / 60)} giờ {feeInfo.SoPhutGui % 60} phút ({feeInfo.SoGioGui}h)
+                    {Math.floor((feeInfo.SoPhutGui || 120) / 60)} giờ {(feeInfo.SoPhutGui || 120) % 60} phút
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-slate-600">Bảng giá áp dụng:</span>
                   <span className="font-bold text-slate-800">{feeInfo.BangGiaApDung}</span>
                 </div>
-                <div className="flex justify-between items-center pt-1 border-t border-sky-100">
-                  <span className="text-slate-600">Cước gửi xe:</span>
-                  <span className="font-bold text-slate-800">{feeInfo.PhiGuiXe?.toLocaleString('vi-VN')} VNĐ</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-600">Tiền cước gửi xe:</span>
+                  <span className="font-bold text-slate-800">{Number(feeInfo.TienPhi || 5000).toLocaleString('vi-VN')} VNĐ</span>
                 </div>
-                {feeInfo.MatVe && (
-                  <div className="flex justify-between items-center text-amber-800 font-bold">
-                    <span>Phụ thu mất vé xe:</span>
-                    <span>+{feeInfo.PhiMatVe?.toLocaleString('vi-VN')} VNĐ</span>
+                {Boolean(feeInfo.PhuThuMatVe) && (
+                  <div className="flex justify-between items-center text-amber-700">
+                    <span className="font-semibold">Phụ thu mất vé xe:</span>
+                    <span className="font-bold">+{Number(feeInfo.PhuThuMatVe).toLocaleString('vi-VN')} VNĐ</span>
                   </div>
                 )}
-                {feeInfo.CoVeThang && (
-                  <div className="flex items-center space-x-1.5 text-emerald-700 font-bold text-[11px] pt-1 border-t border-sky-200/60">
-                    <CreditCard className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Phương tiện có vé tháng hợp lệ - Miễn phí cước gửi lượt</span>
-                  </div>
-                )}
+                <div className="pt-2 border-t border-sky-200/60 flex justify-between items-center text-sm">
+                  <span className="font-extrabold text-slate-900">TỔNG TIỀN PHẢI THU:</span>
+                  <span className="text-xl font-extrabold text-sky-600">
+                    {Number(feeInfo.TongTien || 5000).toLocaleString('vi-VN')} VNĐ
+                  </span>
+                </div>
               </div>
 
-              {/* Total Fee Banner */}
-              <div className="p-5 rounded-2xl bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 text-white flex items-center justify-between shadow-md shadow-sky-900/15">
-                <div>
-                  <span className="text-xs uppercase tracking-wider font-semibold text-sky-100">Tổng tiền thanh toán</span>
-                  <p className="text-3xl font-extrabold tracking-tight">
-                    {(feeInfo.TongThanhToan ?? feeInfo.PhiGuiXe).toLocaleString('vi-VN')} <span className="text-lg font-bold">VNĐ</span>
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleCheckOut}
-                  disabled={loading}
-                  className="px-6 py-3 bg-white hover:bg-sky-50 text-sky-900 rounded-xl text-sm font-extrabold shadow-lg flex items-center space-x-2 transition-all disabled:opacity-50 active:scale-95"
-                >
-                  {loading ? (
-                    <div className="w-5 h-5 border-2 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="w-5 h-5 text-sky-600" />
-                      <span>Xác nhận Cho Xe Ra</span>
-                    </>
-                  )}
-                </button>
-              </div>
+              {/* Confirm Checkout Action */}
+              <button
+                type="button"
+                onClick={handleCheckOut}
+                disabled={loading}
+                className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-2xl text-sm font-extrabold shadow-lg shadow-emerald-500/25 flex items-center justify-center space-x-2 transition-all disabled:opacity-50 active:scale-95"
+              >
+                {loading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span>Xác nhận Thanh toán & Xuất bãi ({Number(feeInfo.TongTien || 5000).toLocaleString('vi-VN')} đ)</span>
+                  </>
+                )}
+              </button>
             </div>
           )}
 
-          {/* Success Check-Out Receipt */}
+          {/* Success Receipt */}
           {successReceipt && (
-            <div className="bg-white p-6 rounded-3xl border-2 border-sky-500 shadow-xl space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div className="flex items-center space-x-2 text-sky-600">
-                  <CheckCircle2 className="w-6 h-6" />
-                  <div>
-                    <h3 className="font-extrabold text-slate-900 text-sm">HÓA ĐƠN XUẤT BÃI & THANH TOÁN</h3>
-                    <p className="text-[10px] text-slate-500">Mã lượt: #{successReceipt.LuotGuiId}</p>
-                  </div>
-                </div>
-                <span className="px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 text-[11px] font-bold border border-sky-200">
-                  Đã hoàn tất
-                </span>
+            <div className="bg-emerald-50 border-2 border-emerald-500 p-6 rounded-3xl space-y-4 animate-in fade-in duration-300">
+              <div className="flex items-center space-x-2 text-emerald-800">
+                <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+                <h3 className="font-extrabold text-base">XUẤT BÃI THÀNH CÔNG!</h3>
               </div>
-
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between py-1 border-b border-slate-50">
-                  <span className="text-slate-500">Biển số:</span>
-                  <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
-                    {successReceipt.BienSo}
-                  </span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-50">
-                  <span className="text-slate-500">Vị trí đã giải phóng:</span>
-                  <span className="font-bold text-sky-600">{successReceipt.TenViTri} (Trạng thái: Trống)</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-50">
-                  <span className="text-slate-500">Thời gian gửi:</span>
-                  <span className="font-semibold text-slate-800">{successReceipt.SoGioGui} giờ</span>
-                </div>
-                {successReceipt.MatVe && (
-                  <div className="flex justify-between py-1 border-b border-slate-50 text-amber-800 font-medium">
-                    <span>Phụ thu mất vé xe:</span>
-                    <span>+{successReceipt.PhiMatVe?.toLocaleString('vi-VN')} VNĐ</span>
-                  </div>
-                )}
-                <div className="flex justify-between py-1 border-b border-slate-50">
-                  <span className="text-slate-500">Tổng tiền đã thanh toán:</span>
-                  <span className="font-extrabold text-slate-900 text-sm">
-                    {(successReceipt.TongThanhToan ?? successReceipt.PhiGuiXe).toLocaleString('vi-VN')} VNĐ
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 pt-2">
+              <p className="text-xs text-emerald-700 font-medium">
+                Xe <strong>{successReceipt.BienSo}</strong> đã hoàn tất thanh toán {Number(successReceipt.TongTien).toLocaleString('vi-VN')} VNĐ và xuất bãi an toàn.
+              </p>
+              <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={handlePrint}
-                  className="flex-1 py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-colors"
+                  className="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-colors"
                 >
                   <Printer className="w-4 h-4" />
-                  <span>In Hóa Đơn</span>
+                  <span>In Phiếu Thu</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setSuccessReceipt(null)}
-                  className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors"
+                  className="py-2.5 px-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold border border-slate-200 transition-colors"
                 >
                   Đóng
                 </button>
@@ -401,12 +389,12 @@ const CheckOut = () => {
         <div className="lg:col-span-5 bg-white p-6 rounded-3xl border border-sky-100 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold uppercase tracking-wider text-slate-700">
-              Xe đang trong bãi ({activeSessions.length})
+              Xe đang trong bãi ({activeSessions ? activeSessions.length : 0})
             </h2>
             <span className="text-[11px] text-slate-400 font-semibold">Click để chọn tính phí</span>
           </div>
 
-          {activeSessions.length === 0 ? (
+          {!activeSessions || activeSessions.length === 0 ? (
             <div className="p-8 text-center text-slate-400 text-xs">Hiện không có xe nào đang đỗ trong bãi.</div>
           ) : (
             <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
@@ -436,7 +424,7 @@ const CheckOut = () => {
                   <div className="text-right">
                     <span className="text-xs font-extrabold text-sky-600 block">{s.TenViTri}</span>
                     <span className="text-[10px] text-slate-400">
-                      {new Date(s.ThoiGianVao).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                      {safeTime(s.ThoiGianVao)}
                     </span>
                   </div>
                 </button>

@@ -11,7 +11,12 @@ import {
   MOCK_PRICING,
   MOCK_MONTHLY_PASSES,
   MOCK_HISTORY,
-  MOCK_VEHICLE_TYPES
+  MOCK_VEHICLE_TYPES,
+  MOCK_AI_AGENTS,
+  MOCK_AI_REPORT_DAY,
+  MOCK_AI_REPORT_WEEK,
+  MOCK_AI_PEAK_HOURS,
+  MOCK_AI_STAFFING
 } from './mockData';
 
 const api = axios.create({
@@ -223,16 +228,58 @@ const handleMockFallback = (config) => {
   if (url.includes('/monthly-passes')) return { data: MOCK_MONTHLY_PASSES, status: 200, statusText: 'OK', headers: {}, config };
   if (url.includes('/history')) return { data: MOCK_HISTORY, status: 200, statusText: 'OK', headers: {}, config };
 
-  // 6. AI Assistant Chatbot
-  if (url.includes('/ai')) {
+  // 6. AI Assistant Endpoints
+  if (url.includes('/ai/agents')) {
+    return { data: MOCK_AI_AGENTS, status: 200, statusText: 'OK', headers: {}, config };
+  }
+
+  if (url.includes('/ai/report')) {
+    let body = {};
+    try { body = typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {}); } catch {}
+    const isWeek = (body.LoaiBaoCao || '').toLowerCase().includes('tuan');
+    return { data: isWeek ? MOCK_AI_REPORT_WEEK : MOCK_AI_REPORT_DAY, status: 200, statusText: 'OK', headers: {}, config };
+  }
+
+  if (url.includes('/ai/peak-hours')) {
+    return { data: MOCK_AI_PEAK_HOURS, status: 200, statusText: 'OK', headers: {}, config };
+  }
+
+  if (url.includes('/ai/staffing-advice')) {
+    return { data: MOCK_AI_STAFFING, status: 200, statusText: 'OK', headers: {}, config };
+  }
+
+  if (url.includes('/ai/chat')) {
+    let body = {};
+    try { body = typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {}); } catch {}
+    const q = (body.CauHoi || '').toLowerCase();
+    let answer = '';
+
+    if (q.includes('giá') || q.includes('phí') || q.includes('bao nhiêu')) {
+      answer = 'Bảng giá gửi xe máy trường ĐH CNTT & TT Thái Nguyên (ICTU):\n• Buổi sáng: 2.000 đ\n• Buổi chiều: 2.000 đ\n• Buổi tối: 3.000 đ\n• Xe gửi qua đêm: 10.000 đ\n• Bị mất vé xe: 10.000 đ\n• Vé tháng sinh viên: 80.000 đ/tháng\n• Vé tháng qua đêm tại nhà xe: 100.000 đ/tháng.';
+    } else if (q.includes('chỗ') || q.includes('trống') || q.includes('lấp đầy')) {
+      answer = 'Hiện tại bãi đỗ xe có tổng cộng 70 vị trí:\n• Đang đỗ: 38 xe\n• Còn trống sẵn sàng: 31 vị trí (Khu A: 11 chỗ, Khu B: 10 chỗ, Khu C: 10 chỗ)\n• Đang bảo trì: 1 vị trí (A-30)\n• Tỷ lệ lấp đầy đạt 54.3%.';
+    } else if (q.includes('doanh thu') || q.includes('tiền')) {
+      answer = 'Doanh thu hôm nay ghi nhận: 950.000 VNĐ (từ 380 lượt phương tiện ra vào bãi). Doanh thu ước tính cả tháng hiện đạt 28.400.000 VNĐ với 125 vé tháng đang hoạt động.';
+    } else if (q.includes('cao điểm') || q.includes('đông')) {
+      answer = 'Khung giờ cao điểm nhất hôm nay là 07:00 - 08:00 sáng với 107 lượt xe phát sinh (95 xe vào, 12 xe ra). Khung giờ cao điểm thứ hai là 12:00 - 13:00 chuyển ca học chiều với 105 lượt.';
+    } else if (q.includes('nhân sự') || q.includes('nhân viên') || q.includes('trực')) {
+      answer = 'Khuyến nghị phân bổ nhân lực 3 ca từ AI:\n• Ca Sáng (06:00 - 14:00): 3 nhân sự (Trọng tâm Cổng 1 giờ vào ca)\n• Ca Chiều (14:00 - 22:00): 2 nhân sự (Thu ngân & giám sát trạm sạc)\n• Ca Đêm (22:00 - 06:00): 1 nhân sự (Trực qua đêm & tuần tra an ninh).';
+    } else {
+      answer = 'Xin chào! Tôi là Trợ lý AI Bãi đỗ xe ICTU. Bãi hiện có 31 chỗ trống sẵn sàng, tỷ lệ lấp đầy 54.3%, lưu lượng vận hành ổn định. Bạn có thể hỏi tôi về biểu phí, vị trí đỗ còn trống, báo cáo lưu lượng hoặc gợi ý phân ca nhân sự!';
+    }
+
     return {
       data: {
-        reply: 'Hệ thống AI nhận diện hiện tại: Tỷ lệ lấp đầy bãi đỗ đạt 65%. Dự báo khung giờ cao điểm tiếp theo vào 16:30 - 18:00 với lưu lượng xe ra lớn. Đề xuất bố trí 2 nhân viên tại cổng ra Khu A và Khu B để tránh ùn ứ.',
-        recommendations: [
-          'Điều hướng xe máy số còn trống sang dãy A-15 đến A-20.',
-          'Mở thêm làn kiểm soát vé tự động tại cổng phụ.',
-          'Ưu tiên xe điện vào trạm sạc Khu C.'
-        ]
+        CauHoi: body.CauHoi || '',
+        CauTraLoi: answer,
+        DuLieuTrichXuat: {},
+        GoiYCauHoiTiepTheo: [
+          'Giá vé gửi xe máy và xe điện hiện tại là bao nhiêu?',
+          'Hiện tại bãi xe còn bao nhiêu chỗ trống?',
+          'Khung giờ nào hôm nay có lượng xe vào cao nhất?',
+          'Gợi ý bố trí nhân sự cho ca làm việc tiếp theo'
+        ],
+        TrangThaiAI: 'ThanhCong'
       },
       status: 200,
       statusText: 'OK',

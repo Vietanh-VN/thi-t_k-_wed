@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import {
+  MOCK_AI_AGENTS,
+  MOCK_AI_REPORT_DAY,
+  MOCK_AI_PEAK_HOURS,
+  MOCK_AI_STAFFING
+} from '../services/mockData';
+import {
   Bot,
   Sparkles,
   FileText,
@@ -22,29 +28,29 @@ const AiAssistant = () => {
   const [activeTab, setActiveTab] = useState('agents'); // 'agents', 'report', 'peak', 'staffing', 'chat'
 
   // Multi-Agent System state
-  const [agentsData, setAgentsData] = useState(null);
+  const [agentsData, setAgentsData] = useState(MOCK_AI_AGENTS);
   const [agentsLoading, setAgentsLoading] = useState(false);
   const [selectedAgentId, setSelectedAgentId] = useState('agent-spot-allocator');
   const [agentActionMessage, setAgentActionMessage] = useState(null);
 
   // Report state
   const [reportType, setReportType] = useState('Ngay');
-  const [reportData, setReportData] = useState(null);
+  const [reportData, setReportData] = useState(MOCK_AI_REPORT_DAY);
   const [reportLoading, setReportLoading] = useState(false);
 
   // Peak hours state
-  const [peakData, setPeakData] = useState(null);
+  const [peakData, setPeakData] = useState(MOCK_AI_PEAK_HOURS);
   const [peakLoading, setPeakLoading] = useState(false);
 
   // Staffing state
-  const [staffingData, setStaffingData] = useState(null);
+  const [staffingData, setStaffingData] = useState(MOCK_AI_STAFFING);
   const [staffingLoading, setStaffingLoading] = useState(false);
 
   // Chat state
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      text: 'Xin chào! Tôi là Trợ lý AI Bãi đỗ xe thông minh. Tôi có thể giúp bạn tổng hợp báo cáo lưu lượng, phân tích khung giờ cao điểm, tính toán doanh thu hoặc gợi ý phương án bố trí nhân sự. Bạn muốn tôi hỗ trợ thông tin gì?',
+      text: 'Xin chào! Tôi là Trợ lý AI Bãi đỗ xe thông minh ICTU. Tôi có thể giúp bạn tổng hợp báo cáo lưu lượng, phân tích khung giờ cao điểm, tính toán doanh thu hoặc gợi ý phương án bố trí nhân sự. Bạn muốn tôi hỗ trợ thông tin gì?',
       time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -52,10 +58,11 @@ const AiAssistant = () => {
   const [chatLoading, setChatLoading] = useState(false);
 
   const fetchAgentsData = async () => {
-    setAgentsLoading(true);
     try {
       const res = await api.get('/ai/agents');
-      setAgentsData(res.data);
+      if (res.data?.agents && Array.isArray(res.data.agents)) {
+        setAgentsData(res.data);
+      }
     } catch (err) {
       console.error(err);
     } finally {

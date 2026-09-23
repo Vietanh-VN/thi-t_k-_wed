@@ -406,12 +406,9 @@ const Dashboard = () => {
                         {new Date(s.ThoiGianVao).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
                       </td>
                       <td className="py-2.5 text-right">
-                        <Link
-                          to={`/check-out?plate=${s.BienSo}`}
-                          className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold text-[11px] transition-colors"
-                        >
-                          Check out
-                        </Link>
+                        <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[11px] border border-emerald-200">
+                          Đang đỗ
+                        </span>
                       </td>
                     </tr>
                   ))}

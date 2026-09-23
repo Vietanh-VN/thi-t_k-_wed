@@ -208,15 +208,6 @@ const CheckIn = () => {
                   </p>
                 </div>
               </div>
-              <div className="pt-1">
-                <Link
-                  to={`/check-out?plate=${encodeURIComponent(bienSo.trim())}`}
-                  className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95"
-                >
-                  <span>Chuyển sang Ghi nhận Xe Ra (Check-Out)</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
             </div>
           )}
 

@@ -461,27 +461,9 @@ const ParkingMap = () => {
             {/* Quick Actions in Modal */}
             <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
               {selectedSpotModal.TrangThai === 'DangSuDung' ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigate(`/check-out?plate=${selectedSpotModal.BienSoHienTai}`);
-                  }}
-                  className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-colors shadow-sm"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Xử lý Check-Out & Tính Phí ({selectedSpotModal.BienSoHienTai})</span>
-                </button>
-              ) : selectedSpotModal.TrangThai === 'Trong' ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigate('/check-in');
-                  }}
-                  className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-colors shadow-sm"
-                >
-                  <LogIn className="w-4 h-4" />
-                  <span>Ghi Nhận Xe Vào Vị Trí Này</span>
-                </button>
+                <div className="p-2.5 rounded-xl bg-sky-50 text-sky-800 text-xs font-bold text-center border border-sky-200">
+                  Phương tiện đang đỗ: {selectedSpotModal.BienSoHienTai}
+                </div>
               ) : null}
 
               <button

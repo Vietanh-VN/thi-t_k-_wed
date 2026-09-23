@@ -92,37 +92,38 @@ export const MOCK_VEHICLE_STATS = [
   { name: 'Xe đạp điện', value: 14 }
 ];
 
-// Tạo danh sách 40 spots cho khu A, 60 spots cho khu B, 20 spots cho khu C
+export const MOCK_VEHICLE_TYPES = [
+  { LoaiXeId: 1, TenLoaiXe: 'Xe máy', MoTa: 'Xe máy số, xe tay ga và xe hai bánh' },
+  { LoaiXeId: 2, TenLoaiXe: 'Xe điện', MoTa: 'Xe máy điện, xe đạp điện có trạm sạc' }
+];
+
+// Danh sách vị trí đỗ xe máy và xe điện
 export const MOCK_SPOTS = [
-  ...Array.from({ length: 20 }, (_, i) => ({
+  ...Array.from({ length: 30 }, (_, i) => ({
     MaViTri: i + 1,
-    MaSoViTri: `A-${String(i + 1).padStart(2, '0')}`,
-    MaKhuVuc: 1,
-    TenKhuVuc: 'Khu A - Ô tô',
-    TrangThai: i < 14 ? 'DangSuDung' : (i === 19 ? 'BaoTri' : 'Trong'),
-    BienSoXe: i < 14 ? `20A-${10000 + i * 111}` : null,
-    ThoiGianVao: i < 14 ? '2026-09-24 07:30:00' : null,
-    LoaiXe: 'OTo'
-  })),
-  ...Array.from({ length: 24 }, (_, i) => ({
-    MaViTri: i + 21,
+    ViTriId: i + 1,
     MaSoViTri: `B-${String(i + 1).padStart(2, '0')}`,
+    TenViTri: `B-${String(i + 1).padStart(2, '0')}`,
     MaKhuVuc: 2,
     TenKhuVuc: 'Khu B - Xe máy',
-    TrangThai: i < 16 ? 'DangSuDung' : (i === 23 ? 'BaoTri' : 'Trong'),
-    BienSoXe: i < 16 ? `20B1-${20000 + i * 222}` : null,
-    ThoiGianVao: i < 16 ? '2026-09-24 08:00:00' : null,
-    LoaiXe: 'XeMay'
+    TrangThai: i < 12 ? 'DangSuDung' : (i === 29 ? 'BaoTri' : 'Trong'),
+    BienSoXe: i < 12 ? `20B1-${20000 + i * 222}` : null,
+    ThoiGianVao: i < 12 ? '2026-09-24 08:00:00' : null,
+    LoaiXe: 'XeMay',
+    LoaiXeId: 1
   })),
-  ...Array.from({ length: 10 }, (_, i) => ({
-    MaViTri: i + 45,
-    MaSoViTri: `C-${String(i + 1).padStart(2, '0')}`,
+  ...Array.from({ length: 15 }, (_, i) => ({
+    MaViTri: i + 31,
+    ViTriId: i + 31,
+    MaSoViTri: `E-${String(i + 1).padStart(2, '0')}`,
+    TenViTri: `E-${String(i + 1).padStart(2, '0')}`,
     MaKhuVuc: 3,
-    TenKhuVuc: 'Khu C - Xe điện & VIP',
-    TrangThai: i < 4 ? 'DangSuDung' : 'Trong',
-    BienSoXe: i < 4 ? `30E-${30000 + i * 333}` : null,
-    ThoiGianVao: i < 4 ? '2026-09-24 08:45:00' : null,
-    LoaiXe: 'OToDien'
+    TenKhuVuc: 'Khu E - Xe máy điện',
+    TrangThai: i < 5 ? 'DangSuDung' : 'Trong',
+    BienSoXe: i < 5 ? `29MD-${30000 + i * 333}` : null,
+    ThoiGianVao: i < 5 ? '2026-09-24 08:45:00' : null,
+    LoaiXe: 'XeDien',
+    LoaiXeId: 2
   }))
 ];
 

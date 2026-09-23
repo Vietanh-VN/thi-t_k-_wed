@@ -10,7 +10,8 @@ import {
   MOCK_ACTIVE_SESSIONS,
   MOCK_PRICING,
   MOCK_MONTHLY_PASSES,
-  MOCK_HISTORY
+  MOCK_HISTORY,
+  MOCK_VEHICLE_TYPES
 } from './mockData';
 
 const api = axios.create({
@@ -99,7 +100,55 @@ const handleMockFallback = (config) => {
   // 4. Bãi đỗ & Vị trí
   if (url.includes('/parking/active-sessions')) return { data: MOCK_ACTIVE_SESSIONS, status: 200, statusText: 'OK', headers: {}, config };
   if (url.includes('/zones')) return { data: MOCK_ZONES, status: 200, statusText: 'OK', headers: {}, config };
-  if (url.includes('/spots')) return { data: MOCK_SPOTS, status: 200, statusText: 'OK', headers: {}, config };
+  if (url.includes('/vehicle-types')) return { data: MOCK_VEHICLE_TYPES, status: 200, statusText: 'OK', headers: {}, config };
+
+  if (url.includes('/vehicles/lookup')) {
+    const segments = url.split('/');
+    const plate = decodeURIComponent(segments[segments.length - 1] || '').toUpperCase();
+    const isElectric = plate.includes('MD');
+    const hasMonthlyPass = plate.includes('77889') || plate.includes('44556');
+    return {
+      data: {
+        BienSo: plate,
+        DangGuiTrongBai: false,
+        CoVeThang: hasMonthlyPass,
+        NgayHetHanVeThang: hasMonthlyPass ? '2026-10-31' : null,
+        LoaiXeId: isElectric ? 2 : 1
+      },
+      status: 200, statusText: 'OK', headers: {}, config
+    };
+  }
+
+  if (url.includes('/spots')) {
+    if (url.includes('status_filter=Trong')) {
+      const vacant = MOCK_SPOTS.filter(s => s.TrangThai === 'Trong');
+      return { data: vacant, status: 200, statusText: 'OK', headers: {}, config };
+    }
+    return { data: MOCK_SPOTS, status: 200, statusText: 'OK', headers: {}, config };
+  }
+
+  // Ghi nhận xe vào /parking/check-in
+  if (url.includes('/parking/check-in') && method === 'post') {
+    let body = {};
+    try { body = typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {}); } catch {}
+    const bienSo = (body.BienSo || '20B1-12345').toUpperCase();
+    const loaiXeId = Number(body.LoaiXeId) || 1;
+    const spotName = body.ViTriId ? (MOCK_SPOTS.find(s => s.ViTriId === Number(body.ViTriId))?.TenViTri || `B-${body.ViTriId}`) : (loaiXeId === 2 ? 'E-06' : 'B-15');
+    const hasPass = bienSo.includes('77889') || bienSo.includes('44556');
+
+    return {
+      data: {
+        LuotGuiId: Math.floor(1000 + Math.random() * 9000),
+        BienSo: bienSo,
+        TenLoaiXe: loaiXeId === 2 ? 'Xe điện' : 'Xe máy',
+        TenViTri: spotName,
+        TenKhuVuc: loaiXeId === 2 ? 'Khu E - Xe máy điện' : 'Khu B - Xe máy',
+        ThoiGianVao: new Date().toISOString(),
+        CoVeThang: hasPass
+      },
+      status: 200, statusText: 'OK', headers: {}, config
+    };
+  }
 
   // Tính phí xuất bãi /parking/calculate-fee
   if (url.includes('/parking/calculate-fee') && method === 'post') {

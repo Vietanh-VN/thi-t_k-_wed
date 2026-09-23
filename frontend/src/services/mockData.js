@@ -127,12 +127,12 @@ export const MOCK_SPOTS = [
 ];
 
 export const MOCK_ACTIVE_SESSIONS = [
-  { MaLuotDo: 101, BienSoXe: '20A-888.88', TenLoaiXe: 'Ô tô 4 chỗ', ThoiGianVao: '2026-09-24 07:45:00', MaViTri: 'A-01', TenKhuVuc: 'Khu A - Ô tô' },
-  { MaLuotDo: 102, BienSoXe: '20B1-123.45', TenLoaiXe: 'Xe máy', ThoiGianVao: '2026-09-24 08:12:00', MaViTri: 'B-03', TenKhuVuc: 'Khu B - Xe máy' },
-  { MaLuotDo: 103, BienSoXe: '30E-666.99', TenLoaiXe: 'Ô tô điện VF8', ThoiGianVao: '2026-09-24 08:30:00', MaViTri: 'C-01', TenKhuVuc: 'Khu C - Xe điện & VIP' },
-  { MaLuotDo: 104, BienSoXe: '20F1-999.22', TenLoaiXe: 'Xe máy Honda', ThoiGianVao: '2026-09-24 08:50:00', MaViTri: 'B-07', TenKhuVuc: 'Khu B - Xe máy' },
-  { MaLuotDo: 105, BienSoXe: '29C-555.12', TenLoaiXe: 'Xe bán tải Ford', ThoiGianVao: '2026-09-24 09:10:00', MaViTri: 'A-09', TenKhuVuc: 'Khu A - Ô tô' },
-  { MaLuotDo: 106, BienSoXe: '20A-333.66', TenLoaiXe: 'Ô tô 7 chỗ', ThoiGianVao: '2026-09-24 09:30:00', MaViTri: 'A-12', TenKhuVuc: 'Khu A - Ô tô' }
+  { LuotGuiId: 101, MaLuotDo: 101, BienSo: '20B1-123.45', BienSoXe: '20B1-123.45', TenLoaiXe: 'Xe máy Honda Wave', ThoiGianVao: '2026-09-24 08:12:00', TenViTri: 'B-03', MaViTri: 'B-03', TenKhuVuc: 'Khu B - Xe máy' },
+  { LuotGuiId: 102, MaLuotDo: 102, BienSo: '20F1-999.22', BienSoXe: '20F1-999.22', TenLoaiXe: 'Xe máy Honda SH', ThoiGianVao: '2026-09-24 08:50:00', TenViTri: 'B-07', MaViTri: 'B-07', TenKhuVuc: 'Khu B - Xe máy' },
+  { LuotGuiId: 103, MaLuotDo: 103, BienSo: '20B2-456.78', BienSoXe: '20B2-456.78', TenLoaiXe: 'Xe máy Yamaha Exciter', ThoiGianVao: '2026-09-24 09:15:00', TenViTri: 'B-11', MaViTri: 'B-11', TenKhuVuc: 'Khu B - Xe máy' },
+  { LuotGuiId: 104, MaLuotDo: 104, BienSo: '20M1-333.88', BienSoXe: '20M1-333.88', TenLoaiXe: 'Xe máy điện VinFast', ThoiGianVao: '2026-09-24 09:35:00', TenViTri: 'B-15', MaViTri: 'B-15', TenKhuVuc: 'Khu B - Xe máy' },
+  { LuotGuiId: 105, MaLuotDo: 105, BienSo: '20H1-777.66', BienSoXe: '20H1-777.66', TenLoaiXe: 'Xe máy Honda Vision', ThoiGianVao: '2026-09-24 09:50:00', TenViTri: 'B-18', MaViTri: 'B-18', TenKhuVuc: 'Khu B - Xe máy' },
+  { LuotGuiId: 106, MaLuotDo: 106, BienSo: '20K1-222.11', BienSoXe: '20K1-222.11', TenLoaiXe: 'Xe máy Honda AirBlade', ThoiGianVao: '2026-09-24 10:10:00', TenViTri: 'B-22', MaViTri: 'B-22', TenKhuVuc: 'Khu B - Xe máy' }
 ];
 
 export const MOCK_PRICING = [

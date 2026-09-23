@@ -101,6 +101,74 @@ const handleMockFallback = (config) => {
   if (url.includes('/zones')) return { data: MOCK_ZONES, status: 200, statusText: 'OK', headers: {}, config };
   if (url.includes('/spots')) return { data: MOCK_SPOTS, status: 200, statusText: 'OK', headers: {}, config };
 
+  // Tính phí xuất bãi /parking/calculate-fee
+  if (url.includes('/parking/calculate-fee') && method === 'post') {
+    let body = {};
+    try {
+      body = typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {});
+    } catch {
+      body = {};
+    }
+    const bienSo = (body.BienSo || '20B1-123.45').toUpperCase();
+    const isMatVe = Boolean(body.MatVe);
+    const matched = MOCK_ACTIVE_SESSIONS.find(s => s.BienSo === bienSo) || MOCK_ACTIVE_SESSIONS[0];
+
+    const phiGui = 5000;
+    const phuThu = isMatVe ? 10000 : 0;
+    const tongTien = phiGui + phuThu;
+
+    return {
+      data: {
+        BienSo: bienSo,
+        TenLoaiXe: matched?.TenLoaiXe || 'Xe máy',
+        TenViTri: matched?.TenViTri || 'B-03',
+        TenKhuVuc: 'Khu B - Xe máy',
+        ThoiGianVao: matched?.ThoiGianVao || '2026-09-24 08:12:00',
+        ThoiGianRa: new Date().toISOString().replace('T', ' ').slice(0, 19),
+        SoPhutGui: 120,
+        SoGioGui: 2,
+        BangGiaApDung: 'Xe máy ban ngày (5.000 VNĐ / lượt)',
+        TienPhi: phiGui,
+        PhuThuMatVe: phuThu,
+        TongTien: tongTien
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config
+    };
+  }
+
+  // Xác nhận thanh toán & xuất bãi /parking/checkout
+  if (url.includes('/parking/checkout') && method === 'post') {
+    let body = {};
+    try {
+      body = typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {});
+    } catch {
+      body = {};
+    }
+    const bienSo = (body.BienSo || '20B1-123.45').toUpperCase();
+    const isMatVe = Boolean(body.MatVe);
+    return {
+      data: {
+        MaPhieuThu: `REC-${Date.now().toString().slice(-6)}`,
+        BienSo: bienSo,
+        TenLoaiXe: 'Xe máy',
+        ViTriDo: 'B-03',
+        ThoiGianVao: '2026-09-24 08:12:00',
+        ThoiGianRa: new Date().toISOString().replace('T', ' ').slice(0, 19),
+        TongTien: isMatVe ? 15000 : 5000,
+        PhuongThucThanhToan: body.PhuongThucThanhToan || 'TienMat',
+        TrangThai: 'ThanhCong',
+        NhanVienThuTien: 'Hoàng Văn Minh'
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config
+    };
+  }
+
   // 5. Bảng giá, Vé tháng, Lịch sử
   if (url.includes('/pricing')) return { data: MOCK_PRICING, status: 200, statusText: 'OK', headers: {}, config };
   if (url.includes('/monthly-passes')) return { data: MOCK_MONTHLY_PASSES, status: 200, statusText: 'OK', headers: {}, config };

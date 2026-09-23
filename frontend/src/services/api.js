@@ -162,7 +162,7 @@ const handleMockFallback = (config) => {
     const isMatVe = Boolean(body.MatVe);
     const matched = MOCK_ACTIVE_SESSIONS.find(s => s.BienSo === bienSo) || MOCK_ACTIVE_SESSIONS[0];
 
-    const phiGui = 5000;
+    const phiGui = 2000;
     const phuThu = isMatVe ? 10000 : 0;
     const tongTien = phiGui + phuThu;
 
@@ -170,13 +170,13 @@ const handleMockFallback = (config) => {
       data: {
         BienSo: bienSo,
         TenLoaiXe: matched?.TenLoaiXe || 'Xe máy',
-        TenViTri: matched?.TenViTri || 'B-03',
-        TenKhuVuc: 'Khu B - Xe máy',
-        ThoiGianVao: matched?.ThoiGianVao || '2026-09-24 08:12:00',
-        ThoiGianRa: new Date().toISOString().replace('T', ' ').slice(0, 19),
+        TenViTri: matched?.TenViTri || 'A-03',
+        TenKhuVuc: matched?.TenKhuVuc || 'Khu A - Xe máy số & Tay ga',
+        ThoiGianVao: matched?.ThoiGianVao || '2026-09-24T08:12:00',
+        ThoiGianRa: new Date().toISOString(),
         SoPhutGui: 120,
         SoGioGui: 2,
-        BangGiaApDung: 'Xe máy ban ngày (5.000 VNĐ / lượt)',
+        BangGiaApDung: 'BUỔI SÁNG / BUỔI CHIỀU (2.000 đ / lượt)',
         TienPhi: phiGui,
         PhuThuMatVe: phuThu,
         TongTien: tongTien
@@ -229,7 +229,7 @@ const handleMockFallback = (config) => {
       data: {
         reply: 'Hệ thống AI nhận diện hiện tại: Tỷ lệ lấp đầy bãi đỗ đạt 65%. Dự báo khung giờ cao điểm tiếp theo vào 16:30 - 18:00 với lưu lượng xe ra lớn. Đề xuất bố trí 2 nhân viên tại cổng ra Khu A và Khu B để tránh ùn ứ.',
         recommendations: [
-          'Điều hướng ô tô còn trống sang dãy A-15 đến A-20.',
+          'Điều hướng xe máy số còn trống sang dãy A-15 đến A-20.',
           'Mở thêm làn kiểm soát vé tự động tại cổng phụ.',
           'Ưu tiên xe điện vào trạm sạc Khu C.'
         ]

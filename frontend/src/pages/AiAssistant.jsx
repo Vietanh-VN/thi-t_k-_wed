@@ -124,7 +124,7 @@ const AiAssistant = () => {
 
   const handleRunAgentAction = (agentId) => {
     if (agentId === 'agent-spot-allocator') {
-      setAgentActionMessage('Tác nhân đã rà soát 100% sơ đồ bãi đỗ: Đang ưu tiên cấp phát chỗ đỗ tại Phân Khu A và Khu B cho xe ô tô con gần lối vào chính.');
+      setAgentActionMessage('Tác nhân đã rà soát 100% sơ đồ bãi đỗ: Đang ưu tiên cấp phát chỗ đỗ tại Phân Khu A và Khu B cho xe máy sinh viên gần lối vào chính.');
     } else if (agentId === 'agent-peak-predictor') {
       setActiveTab('peak');
     } else if (agentId === 'agent-staffing-optimizer') {

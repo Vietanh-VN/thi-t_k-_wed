@@ -95,9 +95,9 @@ const CheckOut = () => {
         throw new Error('Fallback');
       }
     } catch (err) {
-      // Fallback tính phí xe máy an toàn trên GitHub Pages
+      // Fallback tính phí xe máy an toàn trên GitHub Pages theo bảng giá ICTU
       const isMat = Boolean(isLostTicket);
-      const fee = 5000;
+      const fee = 2000;
       const penalty = isMat ? 10000 : 0;
       const cleanPlate = target.trim().toUpperCase();
       const matched = activeSessions.find(s => s.BienSo === cleanPlate) || activeSessions[0];
@@ -106,13 +106,13 @@ const CheckOut = () => {
         LuotGuiId: matched?.LuotGuiId || 101,
         BienSo: cleanPlate,
         TenLoaiXe: matched?.TenLoaiXe || 'Xe máy',
-        TenViTri: matched?.TenViTri || 'B-03',
-        TenKhuVuc: matched?.TenKhuVuc || 'Khu B - Xe máy',
+        TenViTri: matched?.TenViTri || 'A-03',
+        TenKhuVuc: matched?.TenKhuVuc || 'Khu A - Xe máy số & Tay ga',
         ThoiGianVao: matched?.ThoiGianVao || new Date(Date.now() - 7200000).toISOString(),
         ThoiGianRa: new Date().toISOString(),
         SoPhutGui: 120,
         SoGioGui: 2,
-        BangGiaApDung: 'Xe máy ban ngày (5.000 VNĐ / lượt)',
+        BangGiaApDung: 'BUỔI SÁNG / BUỔI CHIỀU (2.000 đ / lượt)',
         TienPhi: fee,
         PhuThuMatVe: penalty,
         TongTien: fee + penalty

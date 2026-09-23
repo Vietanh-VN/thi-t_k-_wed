@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import {
-  Car,
+  Bike,
   Search,
   MapPin,
   DollarSign,
@@ -132,13 +132,13 @@ const CustomerPortal = () => {
 
         <form onSubmit={handleLookup} className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Car className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+            <Bike className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               required
               value={plate}
               onChange={(e) => setPlate(e.target.value.toUpperCase())}
-              placeholder="Nhập biển số xe (VD: 30F-88899, 29A-66688, 20B1-12345)..."
+              placeholder="Nhập biển số xe máy (VD: 20B1-123.45, 20MD-333.88)..."
               className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-base font-mono font-bold text-slate-900 uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
             />
           </div>
@@ -312,7 +312,7 @@ const CustomerPortal = () => {
               <div key={p.BangGiaId} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
                 <div className="flex items-center space-x-2.5">
                   <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 text-indigo-600 flex items-center justify-center font-bold">
-                    <Car className="w-4 h-4" />
+                    <Bike className="w-4 h-4" />
                   </div>
                   <div>
                     <h4 className="font-bold text-slate-800 text-xs">{p.TenLoaiXe}</h4>

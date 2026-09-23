@@ -41,11 +41,11 @@ export const MOCK_USERS = {
 };
 
 export const MOCK_OVERVIEW = {
-  TongSoViTri: 120,
-  SoViTriDangSuDung: 78,
-  SoViTriTrong: 38,
-  SoViTriBaoTri: 4,
-  TyLeLapDay: 65.0,
+  TongSoViTri: 70,
+  SoViTriDangSuDung: 38,
+  SoViTriTrong: 31,
+  SoViTriBaoTri: 1,
+  TyLeLapDay: 54.3,
   TongLuotXeHomNay: 380,
   LuotVaoHomNay: 215,
   LuotRaHomNay: 165,
@@ -81,9 +81,9 @@ export const MOCK_WEEKLY = [
 ];
 
 export const MOCK_ZONES = [
-  { MaKhuVuc: 1, KhuVucId: 1, TenKhuVuc: 'Khu A - Xe máy số & Tay ga', LoaiXePhuHop: 'XeMay', MoTa: 'Khu vực bãi đỗ xe máy sinh viên Cổng 1', TongSoViTri: 60, TongSoCho: 60, SoViTriDangSuDung: 42, SoChoDangDung: 42, SoViTriTrong: 18, SoChoTrong: 18, TyLe: 70, TyLeLapDay: 70 },
-  { MaKhuVuc: 2, KhuVucId: 2, TenKhuVuc: 'Khu B - Xe máy Cán bộ & SV', LoaiXePhuHop: 'XeMay', MoTa: 'Nhà xe có mái che trung tâm ICTU', TongSoViTri: 40, TongSoCho: 40, SoViTriDangSuDung: 26, SoChoDangDung: 26, SoViTriTrong: 14, SoChoTrong: 14, TyLe: 65, TyLeLapDay: 65 },
-  { MaKhuVuc: 3, KhuVucId: 3, TenKhuVuc: 'Khu C - Xe máy điện & Xe đạp điện', LoaiXePhuHop: 'XeDien', MoTa: 'Bãi đỗ có trạm sạc điện thông minh', TongSoViTri: 20, TongSoCho: 20, SoViTriDangSuDung: 10, SoChoDangDung: 10, SoViTriTrong: 10, SoChoTrong: 10, TyLe: 50, TyLeLapDay: 50 }
+  { MaKhuVuc: 1, KhuVucId: 1, TenKhuVuc: 'Khu A - Xe máy số & Tay ga', LoaiXePhuHop: 'XeMay', MoTa: 'Khu vực bãi đỗ xe máy sinh viên Cổng 1', TongSoViTri: 30, TongSoCho: 30, SoViTriDangSuDung: 18, SoChoDangDung: 18, SoViTriTrong: 11, SoChoTrong: 11, TyLe: 60, TyLeLapDay: 60 },
+  { MaKhuVuc: 2, KhuVucId: 2, TenKhuVuc: 'Khu B - Xe máy Cán bộ & SV', LoaiXePhuHop: 'XeMay', MoTa: 'Nhà xe có mái che trung tâm ICTU', TongSoViTri: 25, TongSoCho: 25, SoViTriDangSuDung: 15, SoChoDangDung: 15, SoViTriTrong: 10, SoChoTrong: 10, TyLe: 60, TyLeLapDay: 60 },
+  { MaKhuVuc: 3, KhuVucId: 3, TenKhuVuc: 'Khu C - Xe máy điện & Xe đạp điện', LoaiXePhuHop: 'XeDien', MoTa: 'Bãi đỗ có trạm sạc điện thông minh', TongSoViTri: 15, TongSoCho: 15, SoViTriDangSuDung: 5, SoChoDangDung: 5, SoViTriTrong: 10, SoChoTrong: 10, TyLe: 33, TyLeLapDay: 33 }
 ];
 
 export const MOCK_VEHICLE_STATS = [
@@ -106,10 +106,14 @@ export const MOCK_SPOTS = [
     MaSoViTri: `A-${String(i + 1).padStart(2, '0')}`,
     TenViTri: `A-${String(i + 1).padStart(2, '0')}`,
     MaKhuVuc: 1,
+    KhuVucId: 1,
     TenKhuVuc: 'Khu A - Xe máy số & Tay ga',
+    TenLoaiXe: 'Xe máy số & tay ga',
     TrangThai: i < 18 ? 'DangSuDung' : (i === 29 ? 'BaoTri' : 'Trong'),
     BienSoXe: i < 18 ? `20B1-${10000 + i * 111}` : null,
+    BienSoHienTai: i < 18 ? `20B1-${10000 + i * 111}` : null,
     ThoiGianVao: i < 18 ? '2026-09-24T07:30:00' : null,
+    ThoiGianVaoHienTai: i < 18 ? '2026-09-24 07:30' : null,
     LoaiXe: 'XeMay',
     LoaiXeId: 1
   })),
@@ -119,10 +123,14 @@ export const MOCK_SPOTS = [
     MaSoViTri: `B-${String(i + 1).padStart(2, '0')}`,
     TenViTri: `B-${String(i + 1).padStart(2, '0')}`,
     MaKhuVuc: 2,
+    KhuVucId: 2,
     TenKhuVuc: 'Khu B - Xe máy Cán bộ & SV',
+    TenLoaiXe: 'Xe máy cán bộ & SV',
     TrangThai: i < 15 ? 'DangSuDung' : 'Trong',
     BienSoXe: i < 15 ? `20B2-${20000 + i * 222}` : null,
+    BienSoHienTai: i < 15 ? `20B2-${20000 + i * 222}` : null,
     ThoiGianVao: i < 15 ? '2026-09-24T08:00:00' : null,
+    ThoiGianVaoHienTai: i < 15 ? '2026-09-24 08:00' : null,
     LoaiXe: 'XeMay',
     LoaiXeId: 1
   })),
@@ -132,10 +140,14 @@ export const MOCK_SPOTS = [
     MaSoViTri: `C-${String(i + 1).padStart(2, '0')}`,
     TenViTri: `C-${String(i + 1).padStart(2, '0')}`,
     MaKhuVuc: 3,
+    KhuVucId: 3,
     TenKhuVuc: 'Khu C - Xe máy điện & Xe đạp điện',
+    TenLoaiXe: 'Xe máy điện & xe đạp điện',
     TrangThai: i < 5 ? 'DangSuDung' : 'Trong',
     BienSoXe: i < 5 ? `20MD-${30000 + i * 333}` : null,
+    BienSoHienTai: i < 5 ? `20MD-${30000 + i * 333}` : null,
     ThoiGianVao: i < 5 ? '2026-09-24T08:30:00' : null,
+    ThoiGianVaoHienTai: i < 5 ? '2026-09-24 08:30' : null,
     LoaiXe: 'XeDien',
     LoaiXeId: 2
   }))

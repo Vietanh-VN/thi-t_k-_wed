@@ -9,7 +9,7 @@ import {
   Calendar,
   User,
   Phone,
-  Car,
+  Bike,
   CheckCircle2,
   AlertCircle,
   X,

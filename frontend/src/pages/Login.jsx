@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Car, Lock, Mail, ArrowRight, ShieldCheck, UserCheck, Sparkles, KeyRound, Bot } from 'lucide-react';
+import { Bike, Lock, Mail, ArrowRight, ShieldCheck, UserCheck, Sparkles, KeyRound, Bot } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -64,7 +64,7 @@ const Login = () => {
                 />
               </div>
               <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-lg shadow-sky-900/15">
-                <Car className="w-6 h-6 text-white" />
+                <Bike className="w-6 h-6 text-white" />
               </div>
             </div>
 
@@ -194,7 +194,7 @@ const Login = () => {
                 className="p-3 rounded-2xl bg-cyan-50/80 hover:bg-cyan-100 border border-cyan-200 hover:border-cyan-400 text-left transition-all group shadow-sm hover:shadow"
               >
                 <div className="flex items-center space-x-1.5 text-xs font-bold text-cyan-700 group-hover:text-cyan-800">
-                  <Car className="w-4 h-4 text-cyan-600" />
+                  <Bike className="w-4 h-4 text-cyan-600" />
                   <span>Khách hàng</span>
                 </div>
                 <p className="text-[10px] text-slate-500 truncate mt-1 font-medium">khachhang@...</p>

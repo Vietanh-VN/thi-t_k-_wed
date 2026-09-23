@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { MOCK_ZONES, MOCK_SPOTS } from '../services/mockData';
 import {
   MapPin,
-  Car,
+  Bike,
   Zap,
   Filter,
   RefreshCw,
@@ -20,14 +21,14 @@ import {
 } from 'lucide-react';
 
 const ParkingMap = () => {
-  const [zones, setZones] = useState([]);
-  const [spots, setSpots] = useState([]);
+  const [zones, setZones] = useState(MOCK_ZONES);
+  const [spots, setSpots] = useState(MOCK_SPOTS);
   const [selectedZone, setSelectedZone] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('grouped'); // 'grouped' (theo phân khu) hoặc 'compact' (lưới gọn)
   const [selectedSpotModal, setSelectedSpotModal] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const navigate = useNavigate();
 
@@ -37,8 +38,12 @@ const ParkingMap = () => {
         api.get('/zones'),
         api.get('/spots'),
       ]);
-      setZones(znRes.data);
-      setSpots(spRes.data);
+      if (znRes.data && Array.isArray(znRes.data) && znRes.data.length > 0) {
+        setZones(znRes.data);
+      }
+      if (spRes.data && Array.isArray(spRes.data) && spRes.data.length > 0) {
+        setSpots(spRes.data);
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -73,12 +78,13 @@ const ParkingMap = () => {
 
   // Lọc vị trí theo phân khu, trạng thái và tìm kiếm
   const filterSpotItem = (spot) => {
-    if (selectedZone !== 'all' && spot.KhuVucId !== Number(selectedZone)) return false;
+    const spotZoneId = Number(spot.KhuVucId ?? spot.MaKhuVuc);
+    if (selectedZone !== 'all' && spotZoneId !== Number(selectedZone)) return false;
     if (selectedStatus !== 'all' && spot.TrangThai !== selectedStatus) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase();
-      const matchName = spot.TenViTri?.toLowerCase().includes(q);
-      const matchPlate = spot.BienSoHienTai?.toLowerCase().includes(q);
+      const matchName = (spot.TenViTri || spot.MaSoViTri)?.toLowerCase().includes(q);
+      const matchPlate = (spot.BienSoHienTai || spot.BienSoXe || spot.BienSo)?.toLowerCase().includes(q);
       if (!matchName && !matchPlate) return false;
     }
     return true;
@@ -96,10 +102,13 @@ const ParkingMap = () => {
     const isVacant = spot.TrangThai === 'Trong';
     const isOccupied = spot.TrangThai === 'DangSuDung';
     const isMaintenance = spot.TrangThai === 'BaoTri';
+    const bienSo = spot.BienSoHienTai || spot.BienSoXe || spot.BienSo;
+    const rawTime = spot.ThoiGianVaoHienTai || spot.ThoiGianVao;
+    const timeDisplay = rawTime ? (rawTime.includes('T') ? rawTime.split('T')[1].slice(0, 5) : rawTime.split(' ')[1] || rawTime) : 'Đang đỗ';
 
     return (
       <div
-        key={spot.ViTriId}
+        key={spot.ViTriId || spot.MaViTri}
         onClick={() => setSelectedSpotModal(spot)}
         className={`relative rounded-2xl p-3 border-2 transition-all cursor-pointer flex flex-col justify-between select-none shadow-sm hover:shadow-md hover:-translate-y-0.5 group ${
           isVacant
@@ -113,7 +122,7 @@ const ParkingMap = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1.5">
             <span className="font-mono font-extrabold text-xs text-slate-800 tracking-tight">
-              {spot.TenViTri}
+              {spot.TenViTri || spot.MaSoViTri}
             </span>
           </div>
           <span
@@ -133,12 +142,12 @@ const ParkingMap = () => {
             <div className="space-y-1">
               <div className="inline-block bg-white border border-indigo-200 shadow-xs px-2 py-0.5 rounded-lg">
                 <span className="font-mono text-[11px] font-extrabold text-indigo-900 tracking-tight block">
-                  {spot.BienSoHienTai}
+                  {bienSo}
                 </span>
               </div>
               <div className="text-[10px] text-indigo-600 font-medium flex items-center justify-center space-x-1">
                 <Clock className="w-2.5 h-2.5" />
-                <span>{spot.ThoiGianVaoHienTai?.split(' ')[1] || 'Đang đỗ'}</span>
+                <span>{timeDisplay}</span>
               </div>
             </div>
           ) : isMaintenance ? (
@@ -242,7 +251,7 @@ const ParkingMap = () => {
             <span className="text-2xl font-black text-indigo-700">{occupiedCount}</span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
-            <Car className="w-5 h-5" />
+            <Bike className="w-5 h-5" />
           </div>
         </div>
 
@@ -271,19 +280,23 @@ const ParkingMap = () => {
           >
             Tất cả phân khu ({spots.length})
           </button>
-          {zones.map((z) => (
-            <button
-              key={z.KhuVucId}
-              onClick={() => setSelectedZone(z.KhuVucId)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                selectedZone === z.KhuVucId
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              {z.TenKhuVuc} ({z.TongSoCho})
-            </button>
-          ))}
+          {zones.map((z) => {
+            const zId = z.KhuVucId ?? z.MaKhuVuc;
+            const zSpotCount = spots.filter(s => Number(s.KhuVucId ?? s.MaKhuVuc) === Number(zId)).length;
+            return (
+              <button
+                key={zId}
+                onClick={() => setSelectedZone(zId)}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  Number(selectedZone) === Number(zId)
+                    ? 'bg-indigo-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                {z.TenKhuVuc} ({zSpotCount || z.TongSoCho || 0})
+              </button>
+            );
+          })}
         </div>
 
         {/* Search & Trạng thái filter */}
@@ -317,24 +330,26 @@ const ParkingMap = () => {
         /* CHẾ ĐỘ 1: TÁCH THEO TỪNG PHÂN KHU (GỌN GÀNG, RÕ RÀNG) */
         <div className="space-y-6">
           {zones.map((zone) => {
+            const currentZoneId = Number(zone.KhuVucId ?? zone.MaKhuVuc);
+            const isSpotInZone = (s) => Number(s.KhuVucId ?? s.MaKhuVuc) === currentZoneId;
             const zoneSpots = spots.filter(
-              (s) => s.KhuVucId === zone.KhuVucId && filterSpotItem(s)
+              (s) => isSpotInZone(s) && filterSpotItem(s)
             );
-            const allZoneSpots = spots.filter((s) => s.KhuVucId === zone.KhuVucId);
+            const allZoneSpots = spots.filter(isSpotInZone);
             const zoneOccupied = allZoneSpots.filter((s) => s.TrangThai === 'DangSuDung').length;
             const zoneVacant = allZoneSpots.filter((s) => s.TrangThai === 'Trong').length;
             const occupancyRate = allZoneSpots.length > 0 ? Math.round((zoneOccupied / allZoneSpots.length) * 100) : 0;
             const isElectricZone = zone.TenKhuVuc?.toLowerCase().includes('điện');
 
             return (
-              <div key={zone.KhuVucId} className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
+              <div key={zone.KhuVucId || zone.MaKhuVuc} className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
                 {/* Zone Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
                   <div className="flex items-center space-x-3">
                     <div className={`w-9 h-9 rounded-2xl flex items-center justify-center font-bold ${
                       isElectricZone ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700'
                     }`}>
-                      {isElectricZone ? <Zap className="w-5 h-5" /> : <Car className="w-5 h-5" />}
+                      {isElectricZone ? <Zap className="w-5 h-5" /> : <Bike className="w-5 h-5" />}
                     </div>
                     <div>
                       <div className="flex items-center space-x-2">
@@ -447,12 +462,14 @@ const ParkingMap = () => {
                   <div className="flex justify-between py-1.5 border-b border-slate-50">
                     <span className="text-slate-500">Biển số đang đỗ:</span>
                     <span className="font-mono font-extrabold text-indigo-600 text-sm bg-indigo-50 px-2 py-0.5 rounded">
-                      {selectedSpotModal.BienSoHienTai}
+                      {selectedSpotModal.BienSoHienTai || selectedSpotModal.BienSoXe || selectedSpotModal.BienSo}
                     </span>
                   </div>
                   <div className="flex justify-between py-1.5 border-b border-slate-50">
                     <span className="text-slate-500">Thời gian vào:</span>
-                    <span className="font-semibold text-slate-800">{selectedSpotModal.ThoiGianVaoHienTai}</span>
+                    <span className="font-semibold text-slate-800">
+                      {selectedSpotModal.ThoiGianVaoHienTai || selectedSpotModal.ThoiGianVao || 'Hôm nay'}
+                    </span>
                   </div>
                 </>
               )}
@@ -461,9 +478,29 @@ const ParkingMap = () => {
             {/* Quick Actions in Modal */}
             <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
               {selectedSpotModal.TrangThai === 'DangSuDung' ? (
-                <div className="p-2.5 rounded-xl bg-sky-50 text-sky-800 text-xs font-bold text-center border border-sky-200">
-                  Phương tiện đang đỗ: {selectedSpotModal.BienSoHienTai}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedSpotModal(null);
+                    navigate('/check-out');
+                  }}
+                  className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-colors shadow-sm"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Xuất bãi phương tiện ({selectedSpotModal.BienSoHienTai || selectedSpotModal.BienSoXe || selectedSpotModal.BienSo})</span>
+                </button>
+              ) : selectedSpotModal.TrangThai === 'Trong' ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedSpotModal(null);
+                    navigate('/check-in');
+                  }}
+                  className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-colors shadow-sm"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Ghi nhận xe vào vị trí {selectedSpotModal.TenViTri || selectedSpotModal.MaSoViTri}</span>
+                </button>
               ) : null}
 
               <button

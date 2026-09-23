@@ -4,7 +4,7 @@ import api from '../services/api';
 import { MOCK_ACTIVE_SESSIONS } from '../services/mockData';
 import {
   LogOut,
-  Car,
+  Bike,
   Search,
   Clock,
   DollarSign,
@@ -414,7 +414,7 @@ const CheckOut = () => {
                 >
                   <div className="flex items-center space-x-3">
                     <div className="w-9 h-9 rounded-xl bg-slate-200 group-hover:bg-sky-100 text-slate-700 group-hover:text-sky-700 flex items-center justify-center font-bold text-xs">
-                      <Car className="w-4 h-4" />
+                      <Bike className="w-4 h-4" />
                     </div>
                     <div>
                       <span className="font-mono font-bold text-slate-900 text-xs">{s.BienSo}</span>

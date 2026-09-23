@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import {
-  Car,
+  Bike,
   LogIn,
   LogOut,
   MapPin,
@@ -138,7 +138,7 @@ const Dashboard = () => {
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Tình trạng chỗ đỗ</span>
             <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
-              <Car className="w-5 h-5" />
+              <Bike className="w-5 h-5" />
             </div>
           </div>
           <div className="flex items-baseline space-x-2">

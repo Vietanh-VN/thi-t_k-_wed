@@ -10,7 +10,7 @@ import {
   AlertCircle,
   X,
   Wrench,
-  Car,
+  Bike,
   Check,
   Filter
 } from 'lucide-react';

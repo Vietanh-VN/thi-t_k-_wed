@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../services/api';
 import {
   LogIn,
-  Car,
+  Bike,
   QrCode,
   Printer,
   CheckCircle2,
@@ -347,7 +347,7 @@ const CheckIn = () => {
                 </div>
               ) : (
                 <div className="p-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs flex items-center space-x-2">
-                  <Car className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                  <Bike className="w-4 h-4 text-slate-400 flex-shrink-0" />
                   <span>Khách vãng lai (Tính phí theo bảng giá)</span>
                 </div>
               )}

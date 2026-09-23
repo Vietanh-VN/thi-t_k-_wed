@@ -14,7 +14,7 @@ import {
   Bot,
   UserCircle,
   HelpCircle,
-  Car,
+  Bike,
   ChevronRight,
   ShieldCheck,
   Menu,
@@ -24,13 +24,13 @@ import {
 const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
   const { user, logout, isManager, isStaff } = useAuth();
   const navigate = useNavigate();
-  const [activeCarsCount, setActiveCarsCount] = useState(0);
+  const [activeVehiclesCount, setActiveVehiclesCount] = useState(0);
 
   useEffect(() => {
     const fetchActiveCount = async () => {
       try {
         const res = await api.get('/stats/overview');
-        setActiveCarsCount(res.data.SoXeDangGui || 0);
+        setActiveVehiclesCount(res.data.SoXeDangGui || 0);
       } catch (err) {
         // silent fallback
       }
@@ -63,7 +63,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
       to: '/check-out',
       label: 'Ghi nhận Xe Ra & Phí',
       icon: LogOut,
-      badge: `${activeCarsCount} xe`,
+      badge: `${activeVehiclesCount} xe`,
       badgeColor: 'bg-emerald-500 text-white',
       roles: ['QuanLy', 'NhanVien'],
     },

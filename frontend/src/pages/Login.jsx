@@ -58,7 +58,7 @@ const Login = () => {
             <div className="flex items-center space-x-3 mb-6">
               <div className="w-16 h-16 rounded-2xl bg-white p-1.5 shadow-xl shadow-sky-950/25 flex items-center justify-center border-2 border-white/60">
                 <img
-                  src="/logo-ictu.png"
+                  src="./logo-ictu.png"
                   alt="Logo Trường Đại học Công nghệ Thông tin & Truyền thông - ICTU"
                   className="w-full h-full object-contain"
                 />
@@ -81,7 +81,7 @@ const Login = () => {
 
           <div className="relative z-10 mt-8 pt-6 border-t border-white/20 text-xs text-sky-100 space-y-1.5">
             <div className="flex items-center space-x-2.5">
-              <img src="/logo-ictu.png" alt="ICTU" className="w-6 h-6 rounded-full bg-white p-0.5 shadow-sm" />
+              <img src="./logo-ictu.png" alt="ICTU" className="w-6 h-6 rounded-full bg-white p-0.5 shadow-sm" />
               <p className="font-extrabold text-white text-sm">NHÓM 02 - ĐH CNTT & TT THÁI NGUYÊN</p>
             </div>
             <p className="pl-8.5 text-sky-100">1. Nông Việt Anh (Trưởng nhóm)</p>

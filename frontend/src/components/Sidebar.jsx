@@ -136,7 +136,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
         <div className="p-4 border-b border-sky-100 flex items-center justify-between bg-gradient-to-r from-sky-50/50 to-transparent">
           <div className="flex items-center space-x-3">
             <div className="w-11 h-11 rounded-xl bg-white border border-sky-100 p-1 flex items-center justify-center shadow-md shadow-sky-500/10">
-              <img src="/logo-ictu.png" alt="ICTU" className="w-full h-full object-contain" />
+              <img src="./logo-ictu.png" alt="ICTU" className="w-full h-full object-contain" />
             </div>
             <div>
               <h1 className="font-extrabold text-slate-900 text-sm leading-tight tracking-tight">Smart Parking AI</h1>
